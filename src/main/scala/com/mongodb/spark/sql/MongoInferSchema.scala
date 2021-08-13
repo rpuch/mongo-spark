@@ -65,7 +65,9 @@ object MongoInferSchema extends Logging {
     val samplePoolSize: Int = singlePartitionRDD.readConfig.samplePoolSize
     val sampleSize: Int = singlePartitionRDD.readConfig.sampleSize
 
-    val sampleData: MongoRDD[BsonDocument] = if (singlePartitionRDD.hasSampleAggregateOperator) {
+    val sampleData: MongoRDD[BsonDocument] = if (sampleSize == 1) {
+      singlePartitionRDD
+    } else if (singlePartitionRDD.hasSampleAggregateOperator) {
       val appendedPipeline = if (singlePartitionRDD.readConfig.pipeline.isEmpty || samplePoolSize < 0) {
         Seq(Aggregates.sample(sampleSize))
       } else {
